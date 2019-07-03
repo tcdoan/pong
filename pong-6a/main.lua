@@ -31,7 +31,7 @@ function love.load()
 end
 
 function love.update(dt)
-    if ganeState == 'play' then
+    if gameState == 'play' then
         if ball:collides(player1) then
             ball.dx = -ball.dx * 1.03
             ball.x = player1.x + 5
@@ -44,7 +44,7 @@ function love.update(dt)
 
         if ball:collides(player2) then
             ball.dx = -ball.dx * 1.03
-            ball.x = player2.x -4
+            ball.x = player2.x - 4 
             if ball.dy < 0 then
                 ball.dy = -math.random(10, 150)
             else

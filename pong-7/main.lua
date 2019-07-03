@@ -121,7 +121,6 @@ function love.draw()
 
     player1:render()
     player2:render()
-
     ball:render()
     displayFPS()
     push:apply('end')
