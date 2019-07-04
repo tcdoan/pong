@@ -1,4 +1,3 @@
-
 push = require 'push'
 Class = require 'class'
 require 'Paddle'
@@ -7,7 +6,6 @@ WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
-
 PADDLE_SPEED = 200
 
 function love.load()
@@ -89,7 +87,6 @@ function love.update(dt)
         gameState = 'serve'
     end
 
-    -- player 1 movement
     if love.keyboard.isDown('w') then
         player1.dy = -PADDLE_SPEED
     elseif love.keyboard.isDown('s') then
@@ -98,7 +95,6 @@ function love.update(dt)
         player1.dy = 0
     end
 
-    -- player 2 movement
     if love.keyboard.isDown('up') then
         player2.dy = -PADDLE_SPEED
     elseif love.keyboard.isDown('down') then
@@ -116,7 +112,6 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
-
     if key == 'escape' then
         love.event.quit()
     elseif key == 'enter' or key == 'return' then
@@ -129,13 +124,9 @@ function love.keypressed(key)
 end
 
 function love.draw()
-
     push:apply('start')
-
     love.graphics.clear(40, 45, 52, 255)
-
     love.graphics.setFont(smallFont)
-
     displayScore()
 
     if gameState == 'start' then
@@ -154,9 +145,7 @@ function love.draw()
     player1:render()
     player2:render()
     ball:render()
-
     displayFPS()
-
     push:apply('end')
 end
 
