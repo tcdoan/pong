@@ -1,5 +1,28 @@
+--[[
+    GD50 2018
+    Pong Remake
+
+    pong-12
+    "The Resize Update"
+
+    -- Main Program --
+
+    Author: Colton Ogden
+    cogden@cs50.harvard.edu
+
+    Originally programmed by Atari in 1972. Features two
+    paddles, controlled by players, with the goal of getting
+    the ball past your opponent's edge. First to 10 points wins.
+
+    This version is built to more closely resemble the NES than
+    the original Pong machines or the Atari 2600 in terms of
+    resolution, though in widescreen (16:9) so it looks nicer on 
+    modern systems.
+]]
+
 push = require 'push'
 Class = require 'class'
+
 require 'Paddle'
 require 'Ball'
 
@@ -13,7 +36,6 @@ function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
     love.window.setTitle('Pong')
     math.randomseed(os.time())
-
     smallFont = love.graphics.newFont('font.ttf', 8)
     largeFont = love.graphics.newFont('font.ttf', 16)
     scoreFont = love.graphics.newFont('font.ttf', 32)
@@ -21,13 +43,13 @@ function love.load()
 
     sounds = {
         ['paddle_hit'] = love.audio.newSource('sounds/paddle_hit.wav', 'static'),
-        ['score']      = love.audio.newSource('sounds/score.wav', 'static'),
-        ['wall_hit']   = love.audio.newSource('sounds/wall_hit.wav', 'static')
+        ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
+        ['wall_hit'] = love.audio.newSource('sounds/wall_hit.wav', 'static')
     }
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         fullscreen = false,
-        resizable = false,
+        resizable = true,
         vsync = true
     })
 
@@ -37,7 +59,12 @@ function love.load()
     player1 = Paddle(10, 30, 5, 20)
     player2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
     ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
+
     gameState = 'start'
+end
+
+function love.resize(w, h)
+    push:resize(w, h)
 end
 
 function love.update(dt)
@@ -52,11 +79,13 @@ function love.update(dt)
         if ball:collides(player1) then
             ball.dx = -ball.dx * 1.03
             ball.x = player1.x + 5
+
             if ball.dy < 0 then
                 ball.dy = -math.random(10, 150)
             else
                 ball.dy = math.random(10, 150)
             end
+
             sounds['paddle_hit']:play()
         end
         if ball:collides(player2) then
@@ -68,6 +97,7 @@ function love.update(dt)
             else
                 ball.dy = math.random(10, 150)
             end
+
             sounds['paddle_hit']:play()
         end
 
@@ -76,7 +106,7 @@ function love.update(dt)
             ball.dy = -ball.dy
             sounds['wall_hit']:play()
         end
-        
+
         if ball.y >= VIRTUAL_HEIGHT - 4 then
             ball.y = VIRTUAL_HEIGHT - 4
             ball.dy = -ball.dy
@@ -101,7 +131,7 @@ function love.update(dt)
             servingPlayer = 2
             player1Score = player1Score + 1
             sounds['score']:play()
-            
+
             if player1Score == 10 then
                 winningPlayer = 1
                 gameState = 'done'
@@ -137,9 +167,9 @@ function love.update(dt)
 end
 
 function love.keypressed(key)
+
     if key == 'escape' then
         love.event.quit()
-
     elseif key == 'enter' or key == 'return' then
         if gameState == 'start' then
             gameState = 'serve'
@@ -148,10 +178,8 @@ function love.keypressed(key)
         elseif gameState == 'done' then
             gameState = 'serve'
             ball:reset()
-
             player1Score = 0
             player2Score = 0
-
             if winningPlayer == 1 then
                 servingPlayer = 2
             else
@@ -166,21 +194,18 @@ function love.draw()
     love.graphics.clear(40, 45, 52, 255)
     love.graphics.setFont(smallFont)
     displayScore()
-
     if gameState == 'start' then
         love.graphics.setFont(smallFont)
         love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.printf('Press Enter to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
     elseif gameState == 'serve' then
         love.graphics.setFont(smallFont)
-        love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 
-            0, 10, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.printf('Press Enter to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
     elseif gameState == 'play' then
     elseif gameState == 'done' then
         love.graphics.setFont(largeFont)
-        love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' wins!',
-            0, 10, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Player ' .. tostring(winningPlayer) .. ' wins!', 0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.setFont(smallFont)
         love.graphics.printf('Press Enter to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
     end
@@ -192,7 +217,11 @@ function love.draw()
     push:apply('end')
 end
 
+--[[
+    Renders the current FPS.
+]]
 function displayFPS()
+    -- simple FPS display across all states
     love.graphics.setFont(smallFont)
     love.graphics.setColor(0, 255, 0, 255)
     love.graphics.print('FPS: ' .. tostring(love.timer.getFPS()), 10, 10)
@@ -200,8 +229,6 @@ end
 
 function displayScore()
     love.graphics.setFont(scoreFont)
-    love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50, 
-        VIRTUAL_HEIGHT / 3)
-    love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 30,
-        VIRTUAL_HEIGHT / 3)
+    love.graphics.print(tostring(player1Score), VIRTUAL_WIDTH / 2 - 50, VIRTUAL_HEIGHT / 3)
+    love.graphics.print(tostring(player2Score), VIRTUAL_WIDTH / 2 + 30, VIRTUAL_HEIGHT / 3)
 end
